@@ -6,6 +6,7 @@ use full_moon::{
     tokenizer::{Symbol, TokenKind, TokenReference, TokenType},
     visitors::Visitor,
 };
+use full_moon::ast::luau::{ConstAssignment, ConstFunction};
 use id_arena::{Arena, Id};
 
 use crate::ast_util::extract_static_token;
@@ -839,6 +840,32 @@ impl Visitor for ScopeVisitor {
         }
     }
 
+    fn visit_const_assignment(&mut self, const_assignment: &ConstAssignment) {
+        let mut expressions = const_assignment.expressions().iter();
+
+        for name_token in const_assignment.names() {
+            let expression = expressions.next();
+
+            if let Some(expression) = expression {
+                self.read_expression(expression);
+            }
+
+            self.define_name_full_with_variable(
+                &name_token.token().to_string(),
+                range(name_token),
+                range(const_assignment),
+                Variable {
+                    value: expression.and_then(get_assigned_value),
+                    ..Default::default()
+                },
+            );
+
+            if let Some(expression) = expression {
+                self.write_name(name_token, Some(range(expression)));
+            }
+        }
+    }
+
     fn visit_block(&mut self, block: &ast::Block) {
         if let Some((start, end)) = block.range() {
             if self.else_blocks.contains(&(start.bytes(), end.bytes())) {
@@ -1028,6 +1055,15 @@ impl Visitor for ScopeVisitor {
     }
 
     fn visit_local_function_end(&mut self, _: &ast::LocalFunction) {
+        self.close_scope();
+    }
+
+    fn visit_const_function(&mut self, const_function: &ConstFunction) {
+        self.define_name(const_function.name(), range(const_function.name()));
+        self.open_scope(const_function.body());
+    }
+
+    fn visit_const_function_end(&mut self, _: &ConstFunction) {
         self.close_scope();
     }
 

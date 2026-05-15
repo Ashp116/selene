@@ -840,6 +840,7 @@ impl Visitor for ScopeVisitor {
         }
     }
 
+    #[cfg(feature = "roblox")]
     fn visit_const_assignment(&mut self, const_assignment: &ConstAssignment) {
         let mut expressions = const_assignment.expressions().iter();
 
@@ -1058,11 +1059,13 @@ impl Visitor for ScopeVisitor {
         self.close_scope();
     }
 
+    #[cfg(feature = "roblox")]
     fn visit_const_function(&mut self, const_function: &ConstFunction) {
         self.define_name(const_function.name(), range(const_function.name()));
         self.open_scope(const_function.body());
     }
 
+    #[cfg(feature = "roblox")]
     fn visit_const_function_end(&mut self, _: &ConstFunction) {
         self.close_scope();
     }

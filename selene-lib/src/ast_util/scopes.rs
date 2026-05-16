@@ -6,6 +6,8 @@ use full_moon::{
     tokenizer::{Symbol, TokenKind, TokenReference, TokenType},
     visitors::Visitor,
 };
+
+#[cfg(feature = "roblox")]
 use full_moon::ast::luau::{ConstAssignment, ConstFunction};
 use id_arena::{Arena, Id};
 

@@ -2,6 +2,10 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.31.0..HEAD)
+### Fixed
+- Added support for `EnumItem.EnumType` and `EnumItem:IsA()`.
+- Added support for `Enum:FromName()` and `Enum:FromValue()`.
+- Updated internal parser, adding `const` keyword support.
 
 ## [0.30.1](https://github.com/Kampfkarren/selene/compare/0.30.1) - 2026-03-03
 ### Fixed
